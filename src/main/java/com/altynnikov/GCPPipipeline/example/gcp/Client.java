@@ -3,9 +3,8 @@
  *
  * DO NOT EDIT DIRECTLY
  */
-package example.gcp;
+package com.altynnikov.GCPPipipeline.example.gcp;
 
-import org.apache.avro.generic.GenericArray;
 import org.apache.avro.specific.SpecificData;
 import org.apache.avro.util.Utf8;
 import org.apache.avro.message.BinaryMessageEncoder;
@@ -194,8 +193,8 @@ public class Client extends org.apache.avro.specific.SpecificRecordBase implemen
    * Creates a new Client RecordBuilder.
    * @return A new Client RecordBuilder
    */
-  public static example.gcp.Client.Builder newBuilder() {
-    return new example.gcp.Client.Builder();
+  public static Client.Builder newBuilder() {
+    return new Client.Builder();
   }
 
   /**
@@ -203,11 +202,11 @@ public class Client extends org.apache.avro.specific.SpecificRecordBase implemen
    * @param other The existing builder to copy.
    * @return A new Client RecordBuilder
    */
-  public static example.gcp.Client.Builder newBuilder(example.gcp.Client.Builder other) {
+  public static Client.Builder newBuilder(Client.Builder other) {
     if (other == null) {
-      return new example.gcp.Client.Builder();
+      return new Client.Builder();
     } else {
-      return new example.gcp.Client.Builder(other);
+      return new Client.Builder(other);
     }
   }
 
@@ -216,11 +215,11 @@ public class Client extends org.apache.avro.specific.SpecificRecordBase implemen
    * @param other The existing instance to copy.
    * @return A new Client RecordBuilder
    */
-  public static example.gcp.Client.Builder newBuilder(example.gcp.Client other) {
+  public static Client.Builder newBuilder(Client other) {
     if (other == null) {
-      return new example.gcp.Client.Builder();
+      return new Client.Builder();
     } else {
-      return new example.gcp.Client.Builder(other);
+      return new Client.Builder(other);
     }
   }
 
@@ -245,7 +244,7 @@ public class Client extends org.apache.avro.specific.SpecificRecordBase implemen
      * Creates a Builder by copying an existing Builder.
      * @param other The existing Builder to copy.
      */
-    private Builder(example.gcp.Client.Builder other) {
+    private Builder(Client.Builder other) {
       super(other);
       if (isValidValue(fields()[0], other.id)) {
         this.id = data().deepCopy(fields()[0].schema(), other.id);
@@ -269,7 +268,7 @@ public class Client extends org.apache.avro.specific.SpecificRecordBase implemen
      * Creates a Builder by copying an existing Client instance
      * @param other The existing instance to copy.
      */
-    private Builder(example.gcp.Client other) {
+    private Builder(Client other) {
       super(SCHEMA$);
       if (isValidValue(fields()[0], other.id)) {
         this.id = data().deepCopy(fields()[0].schema(), other.id);
@@ -303,7 +302,7 @@ public class Client extends org.apache.avro.specific.SpecificRecordBase implemen
       * @param value The value of 'id'.
       * @return This builder.
       */
-    public example.gcp.Client.Builder setId(long value) {
+    public Client.Builder setId(long value) {
       validate(fields()[0], value);
       this.id = value;
       fieldSetFlags()[0] = true;
@@ -323,7 +322,7 @@ public class Client extends org.apache.avro.specific.SpecificRecordBase implemen
       * Clears the value of the 'id' field.
       * @return This builder.
       */
-    public example.gcp.Client.Builder clearId() {
+    public Client.Builder clearId() {
       fieldSetFlags()[0] = false;
       return this;
     }
@@ -342,7 +341,7 @@ public class Client extends org.apache.avro.specific.SpecificRecordBase implemen
       * @param value The value of 'name'.
       * @return This builder.
       */
-    public example.gcp.Client.Builder setName(java.lang.CharSequence value) {
+    public Client.Builder setName(java.lang.CharSequence value) {
       validate(fields()[1], value);
       this.name = value;
       fieldSetFlags()[1] = true;
@@ -362,7 +361,7 @@ public class Client extends org.apache.avro.specific.SpecificRecordBase implemen
       * Clears the value of the 'name' field.
       * @return This builder.
       */
-    public example.gcp.Client.Builder clearName() {
+    public Client.Builder clearName() {
       name = null;
       fieldSetFlags()[1] = false;
       return this;
@@ -382,7 +381,7 @@ public class Client extends org.apache.avro.specific.SpecificRecordBase implemen
       * @param value The value of 'phone'.
       * @return This builder.
       */
-    public example.gcp.Client.Builder setPhone(java.lang.CharSequence value) {
+    public Client.Builder setPhone(java.lang.CharSequence value) {
       validate(fields()[2], value);
       this.phone = value;
       fieldSetFlags()[2] = true;
@@ -402,7 +401,7 @@ public class Client extends org.apache.avro.specific.SpecificRecordBase implemen
       * Clears the value of the 'phone' field.
       * @return This builder.
       */
-    public example.gcp.Client.Builder clearPhone() {
+    public Client.Builder clearPhone() {
       phone = null;
       fieldSetFlags()[2] = false;
       return this;
@@ -422,7 +421,7 @@ public class Client extends org.apache.avro.specific.SpecificRecordBase implemen
       * @param value The value of 'address'.
       * @return This builder.
       */
-    public example.gcp.Client.Builder setAddress(java.lang.CharSequence value) {
+    public Client.Builder setAddress(java.lang.CharSequence value) {
       validate(fields()[3], value);
       this.address = value;
       fieldSetFlags()[3] = true;
@@ -442,7 +441,7 @@ public class Client extends org.apache.avro.specific.SpecificRecordBase implemen
       * Clears the value of the 'address' field.
       * @return This builder.
       */
-    public example.gcp.Client.Builder clearAddress() {
+    public Client.Builder clearAddress() {
       address = null;
       fieldSetFlags()[3] = false;
       return this;
