@@ -1,6 +1,7 @@
 package com.altynnikov.GCPPipipeline.Controllers;
 
 import com.altynnikov.GCPPipipeline.Models.Body;
+import com.altynnikov.GCPPipipeline.Services.BigQueryService;
 import com.altynnikov.GCPPipipeline.Services.BucketService;
 import com.altynnikov.GCPPipipeline.Threads.InsertQueryThread;
 import com.altynnikov.GCPPipipeline.example.gcp.Client;
@@ -61,12 +62,29 @@ public class PutSubController {
         Client client = bucketService.
                 downloadClientFileFromBucket(projectId, bucketId, new JSONObject(target).getString("name"));
 
-        insertClientData(client);
+        //insertClientDataAsync(client);
+        insertClientDataSync(client);
 
         return new ResponseEntity(HttpStatus.OK);
     }
 
-    private void insertClientData(Client client) {
+    private void insertClientDataSync(Client client) {
+        Map<String, Object> rowContent = new HashMap<>();
+        rowContent.put("id", client.getId());
+        rowContent.put("name", client.getName());
+
+        BigQueryService bigQueryService = new BigQueryService();
+
+        bigQueryService.insetToStorage("clients", "non_optional", rowContent);
+
+        rowContent.put("phone", client.getPhone());
+        rowContent.put("address", client.getAddress());
+        bigQueryService.insetToStorage("clients", "all_fields", rowContent);
+    }
+
+
+    // TODO: 26/11/2020 (Remote host terminated the handshake)
+    private void insertClientDataAsync(Client client) {
         Map<String, Object> nonOptionalRowContent = new HashMap<>();
         nonOptionalRowContent.put("id", client.getId());
         nonOptionalRowContent.put("name", client.getName());

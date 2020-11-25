@@ -9,7 +9,6 @@ public class InsertQueryThread implements Runnable {
     private final String datasetName;
     private final String tableName;
 
-
     public InsertQueryThread(Map<String, Object> rowContent, String datasetName, String tableName) {
         this.rowContent = rowContent;
         this.datasetName = datasetName;
@@ -18,6 +17,6 @@ public class InsertQueryThread implements Runnable {
 
     @Override
     public void run() {
-        BigQueryService.insetToStorage(datasetName, tableName, rowContent);
+        new BigQueryService().insetToStorage(datasetName, tableName, rowContent);
     }
 }
