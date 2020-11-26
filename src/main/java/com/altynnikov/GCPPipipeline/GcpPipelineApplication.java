@@ -4,9 +4,9 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class GcpPipipelineApplication {
+public class GcpPipelineApplication {
     public static void main(String[] args) {
-        SpringApplication.run(GcpPipipelineApplication.class, args);
+        SpringApplication.run(GcpPipelineApplication.class, args);
     }
 }
 

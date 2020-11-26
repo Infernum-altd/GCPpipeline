@@ -83,7 +83,7 @@ public class PutSubController {
     }
 
 
-    // TODO: 26/11/2020 (Remote host terminated the handshake)
+    // TODO: 26/11/2020 (Remote host terminated the handshake - Exception)
     private void insertClientDataAsync(Client client) {
         Map<String, Object> nonOptionalRowContent = new HashMap<>();
         nonOptionalRowContent.put("id", client.getId());
