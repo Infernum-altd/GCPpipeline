@@ -1,22 +1,23 @@
 package com.altynnikov.GCPPipipeline;
 
-import com.altynnikov.GCPPipipeline.Services.BucketService;
-import com.altynnikov.GCPPipipeline.example.gcp.Client;
+import com.altynnikov.GCPPipipeline.services.BucketService;
+
+import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import java.io.File;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest
 @AutoConfigureMockMvc
 class GcpPipelineApplicationTests {
     @Autowired
     private BucketService bucketService;
-/*    @Autowired
-    private MockMvc mockMvc;*/
 
     @Value("${projectId}")
     private String projectId;
@@ -26,13 +27,10 @@ class GcpPipelineApplicationTests {
     @Test
     public void downloadClientFileFromBucketTest() throws Exception {
 
-        assertEquals(Client.newBuilder()
-                .setId(999)
-                .setName("Ivan Tester")
-                .setPhone("592-000-1236")
-                .setAddress("13 Lucky Street")
-                .build(), bucketService.downloadClientFileFromBucket(projectId, bucketId, "testfile.json"));
+        bucketService.downloadClientFileFromBucket(projectId, bucketId, "testfile.avsc");
 
-
+        File expected = new File("src/test/resources/testfile.avsc");
+        File actual = new File("src/downloads/testfile.avsc");
+        assertTrue(FileUtils.contentEquals(expected, actual), "The files differ!");
     }
 }

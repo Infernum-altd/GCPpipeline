@@ -1,10 +1,11 @@
-package com.altynnikov.GCPPipipeline.Controllers;
+package com.altynnikov.GCPPipipeline.controllers;
 
-import com.altynnikov.GCPPipipeline.Models.Body;
-import com.altynnikov.GCPPipipeline.Services.BigQueryService;
-import com.altynnikov.GCPPipipeline.Services.BucketService;
-import com.altynnikov.GCPPipipeline.Threads.InsertQueryThread;
+import com.altynnikov.GCPPipipeline.models.Body;
+import com.altynnikov.GCPPipipeline.services.BigQueryService;
+import com.altynnikov.GCPPipipeline.services.BucketService;
+import com.altynnikov.GCPPipipeline.threads.InsertQueryThread;
 import com.altynnikov.GCPPipipeline.example.gcp.Client;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,15 +17,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Base64;
-import java.util.HashMap;
-import java.util.Map;
+import java.io.IOException;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 @RestController
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class PutSubController {
-    private final Logger log = Logger.getLogger(PutSubController.class.getName());
+    private final Logger LOG = Logger.getLogger(PutSubController.class.getName());
     private final BucketService bucketService;
 
     @Value("${projectId}")
@@ -32,54 +33,49 @@ public class PutSubController {
     @Value("${bucketId}")
     private String bucketId;
 
-    @Autowired
-    public PutSubController(BucketService bucketService) {
-        this.bucketService = bucketService;
-    }
 
     @RequestMapping(value = "/receivemsg", method = RequestMethod.POST)
-    public ResponseEntity receiveMessage(@RequestBody Body body) {
+    public ResponseEntity<String> receiveMessage(@RequestBody Body body) throws IOException {
         // Get PubSub message from request body.
         Body.Message message = body.getMessage();
 
-        if (message == null) {
+        if (message == null || StringUtils.isEmpty(message.getData())) {
             String msg = "Bad Request: invalid Pub/Sub message format";
-            log.log(Level.WARNING, msg);
-            return new ResponseEntity(msg, HttpStatus.BAD_REQUEST);
+            LOG.log(Level.WARNING, msg);
+            return new ResponseEntity<>(msg, HttpStatus.BAD_REQUEST);
         }
 
-        String data = message.getData();
-        String target =
-                !StringUtils.isEmpty(data) ? new String(Base64.getDecoder().decode(data)) : "";
+        String target = new String(Base64.getDecoder().decode(message.getData()));
 
-        if (target.isEmpty()) {
-            String msg = "Bad Request: invalid Pub/Sub message format";
-            log.log(Level.WARNING, msg);
-            return new ResponseEntity(msg, HttpStatus.BAD_REQUEST);
-        }
-
-
-        Client client = bucketService.
+        List<Client> clients = bucketService.
                 downloadClientFileFromBucket(projectId, bucketId, new JSONObject(target).getString("name"));
 
         //insertClientDataAsync(client);
-        insertClientDataSync(client);
+        insertClientDataSync(clients);
 
-        return new ResponseEntity(HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    private void insertClientDataSync(Client client) {
-        Map<String, Object> rowContent = new HashMap<>();
-        rowContent.put("id", client.getId());
-        rowContent.put("name", client.getName());
+    private void insertClientDataSync(List<Client> clients) {
+        List<Map<String, Object>> rowContents = new ArrayList<>();
+
+        for (Client client: clients) {
+            Map<String, Object> rowContent = new HashMap<>();
+            rowContent.put("id", client.getId());
+            rowContent.put("name", client.getName());
+            rowContents.add(rowContent);
+        }
 
         BigQueryService bigQueryService = new BigQueryService();
 
-        bigQueryService.insetToStorage("clients", "non_optional", rowContent);
+        bigQueryService.insetRowsToStorage("clients", "non_optional", rowContents);
 
-        rowContent.put("phone", client.getPhone());
-        rowContent.put("address", client.getAddress());
-        bigQueryService.insetToStorage("clients", "all_fields", rowContent);
+        for (int i = 0; i < clients.size(); i++) {
+            rowContents.get(i).put("phone", clients.get(i).getPhone());
+            rowContents.get(i).put("address", clients.get(i).getAddress());
+        }
+
+        bigQueryService.insetRowsToStorage("clients", "all_fields", rowContents);
     }
 
 
