@@ -18,6 +18,6 @@ public class InsertQueryThread implements Runnable {
 
     @Override
     public void run() {
-        new BigQueryService().insetRowsToStorage(datasetName, tableName, rowContents);
+        //new BigQueryService().insetRowsToStorage(datasetName, tableName, rowContents);
     }
 }

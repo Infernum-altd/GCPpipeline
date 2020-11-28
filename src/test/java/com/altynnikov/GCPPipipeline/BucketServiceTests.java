@@ -3,11 +3,12 @@ package com.altynnikov.GCPPipipeline;
 import com.altynnikov.GCPPipipeline.example.gcp.Client;
 import com.altynnikov.GCPPipipeline.services.BucketService;
 import org.apache.commons.io.FileUtils;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.event.annotation.BeforeTestClass;
+
 
 import java.io.File;
 import java.util.ArrayList;
@@ -25,10 +26,11 @@ public class BucketServiceTests {
     private String projectId;
     @Value("${bucketId}")
     private String bucketId;
-    private List<Client> clientsList;
 
-    @BeforeTestClass
-    public void setUpClientsList() {
+    private static List<Client> clientsList = new ArrayList<>();
+
+    @BeforeAll
+    public static void setUpClientsList() {
         Client client1 = Client.newBuilder()
                 .setId(999)
                 .setName("Ivan Tester")
@@ -43,7 +45,6 @@ public class BucketServiceTests {
                 .setAddress("13 Unlucky Street")
                 .build();
 
-        clientsList = new ArrayList<>();
         clientsList.add(client1);
         clientsList.add(client2);
     }

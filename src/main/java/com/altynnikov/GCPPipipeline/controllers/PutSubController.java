@@ -3,9 +3,7 @@ package com.altynnikov.GCPPipipeline.controllers;
 import com.altynnikov.GCPPipipeline.models.Body;
 import com.altynnikov.GCPPipipeline.services.BigQueryService;
 import com.altynnikov.GCPPipipeline.services.BucketService;
-import com.altynnikov.GCPPipipeline.threads.InsertQueryThread;
 import com.altynnikov.GCPPipipeline.example.gcp.Client;
-import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,16 +22,24 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 @RestController
-@RequiredArgsConstructor(onConstructor = @__(@Autowired))
+//@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class PutSubController {
-    private final Logger LOG = Logger.getLogger(PutSubController.class.getName());
-    private final BucketService bucketService;
-
     @Value("${projectId}")
     private String projectId;
     @Value("${bucketId}")
     private String bucketId;
 
+    private final Logger LOG = Logger.getLogger(PutSubController.class.getName());
+    private final BucketService bucketService;
+    private final BigQueryService bigQueryService;
+
+
+
+    @Autowired
+    public PutSubController(BucketService bucketService, BigQueryService bigQueryService) {
+        this.bucketService = bucketService;
+        this.bigQueryService = bigQueryService;
+    }
 
     @RequestMapping(value = "/receivemsg", method = RequestMethod.POST)
     public ResponseEntity<String> receiveMessage(@RequestBody Body body) throws IOException {
@@ -59,7 +65,7 @@ public class PutSubController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    private void insertClientDataSync(List<Client> clients) {
+    private void insertClientDataSync(List<Client> clients) throws IOException{
         List<Map<String, Object>> rowContents = new ArrayList<>();
 
         for (Client client : clients) {
@@ -69,7 +75,7 @@ public class PutSubController {
             rowContents.add(rowContent);
         }
 
-        BigQueryService bigQueryService = new BigQueryService();
+        //BigQueryService bigQueryService = new BigQueryService();
 
         bigQueryService.insetRowsToStorage("clients", "non_optional", rowContents);
 
@@ -82,7 +88,7 @@ public class PutSubController {
     }
 
 
-    // TODO: 26/11/2020 (Remote host terminated the handshake - Exception)
+/*    // TODO: 26/11/2020 (Remote host terminated the handshake - Exception)
     private void insertClientDataAsync(Client client) {
         Map<String, Object> nonOptionalRowContent = new HashMap<>();
         nonOptionalRowContent.put("id", client.getId());
@@ -99,5 +105,5 @@ public class PutSubController {
         new Thread(new InsertQueryThread(
                 allClientRowContent, "clients", "all_fields")).start();
 
-    }
+    }*/
 }
