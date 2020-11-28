@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.*;
 import java.util.logging.Level;
@@ -47,8 +48,10 @@ public class PutSubController {
 
         String target = new String(Base64.getDecoder().decode(message.getData()));
 
-        List<Client> clients = bucketService.
+        File downloadedAvro = bucketService.
                 downloadClientFileFromBucket(projectId, bucketId, new JSONObject(target).getString("name"));
+
+        List<Client> clients = bucketService.getClientsFromAvro(downloadedAvro);
 
         //insertClientDataAsync(client);
         insertClientDataSync(clients);
@@ -59,7 +62,7 @@ public class PutSubController {
     private void insertClientDataSync(List<Client> clients) {
         List<Map<String, Object>> rowContents = new ArrayList<>();
 
-        for (Client client: clients) {
+        for (Client client : clients) {
             Map<String, Object> rowContent = new HashMap<>();
             rowContent.put("id", client.getId());
             rowContent.put("name", client.getName());
@@ -85,7 +88,7 @@ public class PutSubController {
         nonOptionalRowContent.put("id", client.getId());
         nonOptionalRowContent.put("name", client.getName());
 
-        new Thread( new InsertQueryThread(
+        new Thread(new InsertQueryThread(
                 nonOptionalRowContent, "clients", "non_optional")).start();
 
         Map<String, Object> allClientRowContent = new HashMap<>(nonOptionalRowContent);
@@ -93,7 +96,7 @@ public class PutSubController {
         allClientRowContent.put("phone", client.getPhone());
         allClientRowContent.put("address", client.getAddress());
 
-        new Thread( new InsertQueryThread(
+        new Thread(new InsertQueryThread(
                 allClientRowContent, "clients", "all_fields")).start();
 
     }

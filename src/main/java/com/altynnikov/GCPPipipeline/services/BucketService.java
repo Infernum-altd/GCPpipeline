@@ -15,7 +15,6 @@ import org.springframework.stereotype.Service;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.net.URI;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,7 +27,7 @@ public class BucketService {
     @Value("${downloadPath}")
     private String downloadPath;
 
-    public List<Client> downloadClientFileFromBucket(
+    public File downloadClientFileFromBucket(
             String projectId, String bucketName, String objectName) throws IOException {
 
         GoogleCredentials credentials = GoogleCredentials.fromStream(new FileInputStream(jsonKeyPath))
@@ -41,27 +40,20 @@ public class BucketService {
 
         blob.downloadTo(Paths.get(file.getAbsolutePath()));
 
-/*        JSONObject fileContent = new JSONObject(new String(blob.getContent()));*/
+        return file;
+    }
 
+    public List<Client> getClientsFromAvro(File avroFile) throws IOException{
         DatumReader<Client> clientDatumReader = new SpecificDatumReader<>(Client.class);
 
-        DataFileReader<Client> dataFileReader = new DataFileReader<>(file, clientDatumReader);
+        DataFileReader<Client> dataFileReader = new DataFileReader<>(avroFile, clientDatumReader);
 
         List<Client> clients = new ArrayList<>();
 
-        while(dataFileReader.hasNext()){
+        while (dataFileReader.hasNext()) {
             clients.add(dataFileReader.next());
         }
 
-        System.out.println(clients.get(0));
         return clients;
-
-/*        return Client.newBuilder()
-                .setId(fileContent.getInt("id"))
-                .setName(fileContent.getString("name"))
-                .setPhone(fileContent.getString("phone"))
-                .setAddress(fileContent.getString("address"))
-                .build();*/
-
     }
 }
