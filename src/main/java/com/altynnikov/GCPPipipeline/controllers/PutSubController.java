@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.*;
 import java.util.logging.Level;
@@ -31,11 +30,13 @@ public class PutSubController {
     private String bucketId;
 
     private final Logger LOG = Logger.getLogger(PutSubController.class.getName());
+
     private final BucketService bucketService;
     private final BigQueryService bigQueryService;
 
     @RequestMapping(value = "/receivemsg", method = RequestMethod.POST)
     public ResponseEntity<String> receiveMessage(@RequestBody Body body) throws IOException {
+        System.out.println(body);
         // Get PubSub message from request body.
         Body.Message message = body.getMessage();
 
@@ -47,18 +48,18 @@ public class PutSubController {
 
         String target = new String(Base64.getDecoder().decode(message.getData()));
 
-        File downloadedAvro = bucketService.
+        byte[] downloadedAvro = bucketService.
                 downloadClientFileFromBucket(projectId, bucketId, new JSONObject(target).getString("name"));
 
         List<Client> clients = bucketService.getClientsFromAvro(downloadedAvro);
 
-        //insertClientDataAsync(client);
         insertClientDataSync(clients);
 
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     private void insertClientDataSync(List<Client> clients) throws IOException{
+        System.out.println(clients.get(0).getId() + " " + clients.get(0).getName());
         List<Map<String, Object>> rowContents = new ArrayList<>();
 
         for (Client client : clients) {
@@ -68,35 +69,19 @@ public class PutSubController {
             rowContents.add(rowContent);
         }
 
-        //BigQueryService bigQueryService = new BigQueryService();
-
         bigQueryService.insetRowsToStorage("clients", "non_optional", rowContents);
 
-        for (int i = 0; i < clients.size(); i++) {
-            rowContents.get(i).put("phone", clients.get(i).getPhone());
-            rowContents.get(i).put("address", clients.get(i).getAddress());
+        List<Map<String, Object>> rowContentForAllFields = new ArrayList<>();
+
+        for (Client client : clients) {
+            Map<String, Object> rowContent = new HashMap<>();
+            rowContent.put("id", client.getId());
+            rowContent.put("name", client.getName());
+            rowContent.put("phone", client.getPhone());
+            rowContent.put("address", client.getAddress());
+            rowContentForAllFields.add(rowContent);
         }
 
-        bigQueryService.insetRowsToStorage("clients", "all_fields", rowContents);
+        bigQueryService.insetRowsToStorage("clients", "all_fields", rowContentForAllFields);
     }
-
-
-/*    // TODO: 26/11/2020 (Remote host terminated the handshake - Exception)
-    private void insertClientDataAsync(Client client) {
-        Map<String, Object> nonOptionalRowContent = new HashMap<>();
-        nonOptionalRowContent.put("id", client.getId());
-        nonOptionalRowContent.put("name", client.getName());
-
-        new Thread(new InsertQueryThread(
-                nonOptionalRowContent, "clients", "non_optional")).start();
-
-        Map<String, Object> allClientRowContent = new HashMap<>(nonOptionalRowContent);
-
-        allClientRowContent.put("phone", client.getPhone());
-        allClientRowContent.put("address", client.getAddress());
-
-        new Thread(new InsertQueryThread(
-                allClientRowContent, "clients", "all_fields")).start();
-
-    }*/
 }

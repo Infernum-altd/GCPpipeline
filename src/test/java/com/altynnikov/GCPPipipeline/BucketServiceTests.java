@@ -52,16 +52,17 @@ public class BucketServiceTests {
     @Test
     public void downloadClientFileFromBucketTest() throws Exception {
 
-        bucketService.downloadClientFileFromBucket(projectId, bucketId, "testfile.avsc");
+        byte[] actual = bucketService.downloadClientFileFromBucket(projectId, bucketId, "testfile.avsc");
 
         File expected = new File("src/test/resources/testfile.avsc");
-        File actual = new File("src/downloads/testfile.avsc");
-        assertTrue(FileUtils.contentEquals(expected, actual), "The files differ!");
+        File actualFile = new File("src/downloads/testfile.avsc");
+        FileUtils.writeByteArrayToFile(actualFile, actual);
+        assertTrue(FileUtils.contentEquals(expected, actualFile), "The files differ!");
     }
 
     @Test
     public void getClientsFromAvroTest() throws Exception {
-        List<Client> actual = bucketService.getClientsFromAvro(new File("src/test/resources/testfile.avsc"));
+        List<Client> actual = bucketService.getClientsFromAvro(FileUtils.readFileToByteArray(new File("src/test/resources/testfile.avsc")));
         assertEquals(clientsList, actual);
     }
 }

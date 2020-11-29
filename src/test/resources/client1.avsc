@@ -1,0 +1,24 @@
+{
+    "arr":
+    [
+            {
+                "id": "11",
+                "name": "Bruce Name",
+                "phone": "111-573-7236",
+                "address": "11 Russell Way"
+            },
+            {
+                "id": "12",
+                "name": "Bruce Surname",
+                "phone": "112-573-7236",
+                "address": "12 Russell Way"
+            },
+            {
+              "id": "13",
+              "name": "Sername Lastname",
+              "phone": "113-228-6636",
+              "address": "13 Russell Help"
+            }
+        ]
+}
+

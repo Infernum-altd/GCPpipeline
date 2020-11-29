@@ -29,17 +29,33 @@ public class BigQueryServiceTest {
     @BeforeAll
     public static void setUp() {
         Client client = Client.newBuilder()
-                .setId(999)
+                .setId(998)
                 .setName("Ivan Tester")
                 .setPhone("592-000-1236")
                 .setAddress("13 Lucky Street")
+                .build();
+
+        Client client2 = Client.newBuilder()
+                .setId(997)
+                .setName("Bogdan Tester")
+                .setPhone("192-101-1231")
+                .setAddress("12 Unlucky Street")
                 .build();
 
 
         Map<String, Object> rowContent = new HashMap<>();
         rowContent.put("id", client.getId());
         rowContent.put("name", client.getName());
+        rowContent.put("phone", client.getPhone());
+        rowContent.put("address", client.getAddress());
         rowContents.add(rowContent);
+
+        Map<String, Object> rowContent2 = new HashMap<>();
+        rowContent2.put("id", client2.getId());
+        rowContent2.put("name", client2.getName());
+        rowContent2.put("phone", client2.getPhone());
+        rowContent2.put("address", client2.getAddress());
+        rowContents.add(rowContent2);
     }
 
     @Test
@@ -51,7 +67,7 @@ public class BigQueryServiceTest {
         logger.addHandler(handler);
         logger.setLevel(Level.ALL);
 
-        bigQueryService.insetRowsToStorage("clients", "non_optional", rowContents);
+        bigQueryService.insetRowsToStorage("clients", "all_fields", rowContents);
 
         assertEquals(Level.INFO, handler.checkLevel());
     }
