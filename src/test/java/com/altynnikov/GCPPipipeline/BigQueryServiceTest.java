@@ -44,10 +44,10 @@ public class BigQueryServiceTest {
 
     @Test
     public void insetRowsToStorage() throws Exception {
-        Logger logger = Logger.getLogger(BigQueryServiceTest.class.getName());
+        Logger logger = Logger.getLogger(BigQueryService.class.getName());
         LogHandler handler = new LogHandler();
         handler.setLevel(Level.ALL);
-        logger.setUseParentHandlers(false);
+        logger.setUseParentHandlers(true);
         logger.addHandler(handler);
         logger.setLevel(Level.ALL);
 

@@ -2,6 +2,7 @@ package com.altynnikov.GCPPipipeline.services;
 
 import com.altynnikov.GCPPipipeline.exeptions.ResponseHasErrorsException;
 import com.google.cloud.bigquery.*;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -13,16 +14,10 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 @Service
-//@RequiredArgsConstructor(onConstructor = @__(@Autowired))
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class BigQueryService {
     private final Logger LOG = Logger.getLogger(BigQueryService.class.getName());
-
     private final GoogleCredentialsService googleCredentialsService;
-
-    @Autowired
-    public BigQueryService(GoogleCredentialsService googleCredentialsService) {
-        this.googleCredentialsService = googleCredentialsService;
-    }
 
     public void insetRowsToStorage(String datasetName, String tableName, List<Map<String, Object>> rowContents) throws IOException {
         for (Map<String, Object> rowContent : rowContents) {
@@ -36,14 +31,14 @@ public class BigQueryService {
 
     private void insetRowToStorage(String datasetName, String tableName, Map<String, Object> rowContent) throws ResponseHasErrorsException, IOException {
         try {
-            BigQuery BIG_QUERY = BigQueryOptions.newBuilder()
+            BigQuery bigQuery = BigQueryOptions.newBuilder()
                     .setCredentials(googleCredentialsService.getCredentials()).build().getService();
             // Get table
             TableId tableId = TableId.of(datasetName, tableName);
 
             // Inserts rowContent into datasetName:tableId.
             InsertAllResponse response =
-                    BIG_QUERY.insertAll(
+                    bigQuery.insertAll(
                             InsertAllRequest.newBuilder(tableId)
                                     .addRow(rowContent)
                                     .build());

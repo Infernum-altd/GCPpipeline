@@ -27,7 +27,7 @@ public class BucketServiceTests {
     @Value("${bucketId}")
     private String bucketId;
 
-    private static List<Client> clientsList = new ArrayList<>();
+    private static final List<Client> clientsList = new ArrayList<>();
 
     @BeforeAll
     public static void setUpClientsList() {

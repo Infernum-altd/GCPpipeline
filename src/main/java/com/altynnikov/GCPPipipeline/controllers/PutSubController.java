@@ -4,6 +4,7 @@ import com.altynnikov.GCPPipipeline.models.Body;
 import com.altynnikov.GCPPipipeline.services.BigQueryService;
 import com.altynnikov.GCPPipipeline.services.BucketService;
 import com.altynnikov.GCPPipipeline.example.gcp.Client;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +23,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 @RestController
-//@RequiredArgsConstructor(onConstructor = @__(@Autowired))
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class PutSubController {
     @Value("${projectId}")
     private String projectId;
@@ -32,14 +33,6 @@ public class PutSubController {
     private final Logger LOG = Logger.getLogger(PutSubController.class.getName());
     private final BucketService bucketService;
     private final BigQueryService bigQueryService;
-
-
-
-    @Autowired
-    public PutSubController(BucketService bucketService, BigQueryService bigQueryService) {
-        this.bucketService = bucketService;
-        this.bigQueryService = bigQueryService;
-    }
 
     @RequestMapping(value = "/receivemsg", method = RequestMethod.POST)
     public ResponseEntity<String> receiveMessage(@RequestBody Body body) throws IOException {

@@ -1,6 +1,7 @@
 package com.altynnikov.GCPPipipeline.services;
 
 import com.altynnikov.GCPPipipeline.example.gcp.Client;
+import lombok.RequiredArgsConstructor;
 import org.apache.avro.file.DataFileReader;
 import org.apache.avro.io.DatumReader;
 import org.apache.avro.specific.SpecificDatumReader;
@@ -21,16 +22,12 @@ import java.util.List;
 
 
 @Service
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class BucketService {
     @Value("${downloadPath}")
     private String downloadPath;
 
     private final GoogleCredentialsService googleCredentialsService;
-
-    @Autowired
-    public BucketService(GoogleCredentialsService googleCredentialsService) {
-        this.googleCredentialsService = googleCredentialsService;
-    }
 
     public File downloadClientFileFromBucket(String projectId, String bucketName, String objectName) throws IOException {
 
