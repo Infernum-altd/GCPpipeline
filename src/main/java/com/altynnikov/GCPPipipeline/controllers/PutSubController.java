@@ -53,34 +53,8 @@ public class PutSubController {
 
         List<Client> clients = bucketService.getClientsFromAvro(downloadedAvro);
 
-        insertClientDataSync(clients);
+        bigQueryService.insertClientDataSync(clients);
 
         return new ResponseEntity<>(HttpStatus.OK);
-    }
-
-    private void insertClientDataSync(List<Client> clients) throws IOException {
-        List<Map<String, Object>> rowContentForAllFields = new ArrayList<>();
-
-        for (Client client : clients) {
-            Map<String, Object> rowContent = new HashMap<>();
-            rowContent.put("id", client.getId());
-            rowContent.put("name", client.getName().toString());
-            rowContent.put("phone", client.getPhone().toString());
-            rowContent.put("address", client.getAddress().toString());
-            rowContentForAllFields.add(rowContent);
-        }
-
-        bigQueryService.insetRowsToStorage("clients", "all_fields", rowContentForAllFields);
-
-        List<Map<String, Object>> rowContents = new ArrayList<>();
-
-        for (Client client : clients) {
-            Map<String, Object> rowContent = new HashMap<>();
-            rowContent.put("id", client.getId());
-            rowContent.put("name", client.getName().toString());
-            rowContents.add(rowContent);
-        }
-
-        bigQueryService.insetRowsToStorage("clients", "non_optional", rowContents);
     }
 }

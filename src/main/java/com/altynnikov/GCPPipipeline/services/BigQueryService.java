@@ -1,5 +1,6 @@
 package com.altynnikov.GCPPipipeline.services;
 
+import com.altynnikov.GCPPipipeline.example.gcp.Client;
 import com.altynnikov.GCPPipipeline.exeptions.ResponseHasErrorsException;
 import com.google.cloud.bigquery.*;
 import lombok.RequiredArgsConstructor;
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -32,6 +34,32 @@ public class BigQueryService {
         } catch (ResponseHasErrorsException e) {
             LOG.log(Level.WARNING, e.getMessage());
         }
+    }
+
+    public void insertClientDataSync(List<Client> clients) throws IOException {
+        List<Map<String, Object>> rowContentForAllFields = new ArrayList<>();
+
+        for (Client client : clients) {
+            Map<String, Object> rowContent = new HashMap<>();
+            rowContent.put("id", client.getId());
+            rowContent.put("name", client.getName().toString());
+            rowContent.put("phone", client.getPhone().toString());
+            rowContent.put("address", client.getAddress().toString());
+            rowContentForAllFields.add(rowContent);
+        }
+
+        insetRowsToStorage("clients", "all_fields", rowContentForAllFields);
+
+        List<Map<String, Object>> rowContents = new ArrayList<>();
+
+        for (Client client : clients) {
+            Map<String, Object> rowContent = new HashMap<>();
+            rowContent.put("id", client.getId());
+            rowContent.put("name", client.getName().toString());
+            rowContents.add(rowContent);
+        }
+
+        insetRowsToStorage("clients", "non_optional", rowContents);
     }
 
     private void insetRowToStorage(String datasetName, String tableName, List<InsertAllRequest.RowToInsert> rowContents) throws ResponseHasErrorsException, IOException {
