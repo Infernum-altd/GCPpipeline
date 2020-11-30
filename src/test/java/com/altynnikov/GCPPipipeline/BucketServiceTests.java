@@ -55,7 +55,7 @@ public class BucketServiceTests {
         byte[] actual = bucketService.downloadClientFileFromBucket(projectId, bucketId, "testfile.avsc");
 
         File expected = new File("src/test/resources/testfile.avsc");
-        File actualFile = new File("src/downloads/testfile.avsc");
+        File actualFile = new File("src/test/actualtestfile.avsc");
         FileUtils.writeByteArrayToFile(actualFile, actual);
         assertTrue(FileUtils.contentEquals(expected, actualFile), "The files differ!");
     }

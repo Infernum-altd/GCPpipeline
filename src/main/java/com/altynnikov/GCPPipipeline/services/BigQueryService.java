@@ -18,6 +18,7 @@ import java.util.logging.Logger;
 public class BigQueryService {
     private final Logger LOG = Logger.getLogger(BigQueryService.class.getName());
     private final GoogleCredentialsService googleCredentialsService;
+    private BigQuery bigQuery = null;
 
     public void insetRowsToStorage(String datasetName, String tableName, List<Map<String, Object>> rowContents) throws IOException {
         for (Map<String, Object> rowContent : rowContents) {
@@ -31,8 +32,10 @@ public class BigQueryService {
 
     private void insetRowToStorage(String datasetName, String tableName, Map<String, Object> rowContent) throws ResponseHasErrorsException, IOException {
         try {
-            BigQuery bigQuery = BigQueryOptions.newBuilder()
-                    .setCredentials(googleCredentialsService.getCredentials()).build().getService();
+
+            bigQuery = (bigQuery == null) ? BigQueryOptions.newBuilder()
+                    .setCredentials(googleCredentialsService.getCredentials()).build().getService() : bigQuery;
+
             // Get table
             TableId tableId = TableId.of(datasetName, tableName);
 
