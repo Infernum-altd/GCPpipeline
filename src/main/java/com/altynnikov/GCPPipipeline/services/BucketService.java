@@ -1,6 +1,7 @@
 package com.altynnikov.GCPPipipeline.services;
 
 import com.altynnikov.GCPPipipeline.example.gcp.Client;
+import com.altynnikov.GCPPipipeline.exeptions.AvroNoClientFoundException;
 import lombok.RequiredArgsConstructor;
 import org.apache.avro.file.DataFileReader;
 import org.apache.avro.file.SeekableByteArrayInput;
@@ -38,7 +39,7 @@ public class BucketService {
         return blob.getContent();
     }
 
-    public List<Client> getClientsFromAvro(byte[] avroFile) throws IOException {
+    public List<Client> getClientsFromAvro(byte[] avroFile) throws IOException, AvroNoClientFoundException {
         DatumReader<Client> clientDatumReader = new SpecificDatumReader<>(Client.class);
 
         DataFileReader<Client> dataFileReader = new DataFileReader<>(new SeekableByteArrayInput(avroFile), clientDatumReader);
@@ -48,6 +49,8 @@ public class BucketService {
         while (dataFileReader.hasNext()) {
             clients.add(dataFileReader.next());
         }
+
+        if (clients.isEmpty()) throw new AvroNoClientFoundException("In avro wasn`t found any clients record");
 
         return clients;
     }

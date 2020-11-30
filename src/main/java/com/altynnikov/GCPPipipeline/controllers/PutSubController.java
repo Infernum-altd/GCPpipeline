@@ -1,6 +1,6 @@
 package com.altynnikov.GCPPipipeline.controllers;
 
-import com.altynnikov.GCPPipipeline.exeptions.ResponseHasErrorsException;
+import com.altynnikov.GCPPipipeline.exeptions.AvroNoClientFoundException;
 import com.altynnikov.GCPPipipeline.models.Body;
 import com.altynnikov.GCPPipipeline.services.BigQueryService;
 import com.altynnikov.GCPPipipeline.services.BucketService;
@@ -36,8 +36,7 @@ public class PutSubController {
     private final BigQueryService bigQueryService;
 
     @RequestMapping(value = "/receivemsg", method = RequestMethod.POST)
-    public ResponseEntity<String> receiveMessage(@RequestBody Body body) throws IOException, ResponseHasErrorsException {
-        System.out.println(body);
+    public ResponseEntity<String> receiveMessage(@RequestBody Body body) throws IOException, AvroNoClientFoundException {
         // Get PubSub message from request body.
         Body.Message message = body.getMessage();
 
