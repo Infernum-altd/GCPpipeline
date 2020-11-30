@@ -1,5 +1,6 @@
 package com.altynnikov.GCPPipipeline.controllers;
 
+import com.altynnikov.GCPPipipeline.exeptions.ResponseHasErrorsException;
 import com.altynnikov.GCPPipipeline.models.Body;
 import com.altynnikov.GCPPipipeline.services.BigQueryService;
 import com.altynnikov.GCPPipipeline.services.BucketService;
@@ -35,7 +36,7 @@ public class PutSubController {
     private final BigQueryService bigQueryService;
 
     @RequestMapping(value = "/receivemsg", method = RequestMethod.POST)
-    public ResponseEntity<String> receiveMessage(@RequestBody Body body) throws IOException {
+    public ResponseEntity<String> receiveMessage(@RequestBody Body body) throws IOException, ResponseHasErrorsException {
         System.out.println(body);
         // Get PubSub message from request body.
         Body.Message message = body.getMessage();
@@ -58,30 +59,29 @@ public class PutSubController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    private void insertClientDataSync(List<Client> clients) throws IOException{
-        System.out.println(clients.get(0).getId() + " " + clients.get(0).getName());
-        List<Map<String, Object>> rowContents = new ArrayList<>();
-
-        for (Client client : clients) {
-            Map<String, Object> rowContent = new HashMap<>();
-            rowContent.put("id", client.getId());
-            rowContent.put("name", client.getName());
-            rowContents.add(rowContent);
-        }
-
-        bigQueryService.insetRowsToStorage("clients", "non_optional", rowContents);
-
+    private void insertClientDataSync(List<Client> clients) throws IOException {
         List<Map<String, Object>> rowContentForAllFields = new ArrayList<>();
 
         for (Client client : clients) {
             Map<String, Object> rowContent = new HashMap<>();
             rowContent.put("id", client.getId());
-            rowContent.put("name", client.getName());
-            rowContent.put("phone", client.getPhone());
-            rowContent.put("address", client.getAddress());
+            rowContent.put("name", client.getName().toString());
+            rowContent.put("phone", client.getPhone().toString());
+            rowContent.put("address", client.getAddress().toString());
             rowContentForAllFields.add(rowContent);
         }
 
         bigQueryService.insetRowsToStorage("clients", "all_fields", rowContentForAllFields);
+
+        List<Map<String, Object>> rowContents = new ArrayList<>();
+
+        for (Client client : clients) {
+            Map<String, Object> rowContent = new HashMap<>();
+            rowContent.put("id", client.getId());
+            rowContent.put("name", client.getName().toString());
+            rowContents.add(rowContent);
+        }
+
+        bigQueryService.insetRowsToStorage("clients", "non_optional", rowContents);
     }
 }

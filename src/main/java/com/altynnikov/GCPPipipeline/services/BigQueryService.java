@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -21,16 +22,19 @@ public class BigQueryService {
     private BigQuery bigQuery = null;
 
     public void insetRowsToStorage(String datasetName, String tableName, List<Map<String, Object>> rowContents) throws IOException {
+        List<InsertAllRequest.RowToInsert> rowToInserts = new ArrayList<>();
         for (Map<String, Object> rowContent : rowContents) {
-            try {
-                insetRowToStorage(datasetName, tableName, rowContent);
-            } catch (ResponseHasErrorsException e) {
-                LOG.log(Level.WARNING, e.getMessage());
-            }
+            rowToInserts.add(InsertAllRequest.RowToInsert.of(rowContent));
+        }
+
+        try {
+            insetRowToStorage(datasetName, tableName, rowToInserts);
+        } catch (ResponseHasErrorsException e) {
+            LOG.log(Level.WARNING, e.getMessage());
         }
     }
 
-    private void insetRowToStorage(String datasetName, String tableName, Map<String, Object> rowContent) throws ResponseHasErrorsException, IOException {
+    private void insetRowToStorage(String datasetName, String tableName, List<InsertAllRequest.RowToInsert> rowContents) throws ResponseHasErrorsException, IOException {
         try {
 
             bigQuery = (bigQuery == null) ? BigQueryOptions.newBuilder()
@@ -43,7 +47,7 @@ public class BigQueryService {
             InsertAllResponse response =
                     bigQuery.insertAll(
                             InsertAllRequest.newBuilder(tableId)
-                                    .addRow(rowContent)
+                                    .setRows(rowContents)
                                     .build());
 
             if (response.hasErrors()) {

@@ -3,19 +3,19 @@
     [
             {
                 "id": "11",
-                "name": "Bruce Name",
+                "name": "Bruce1",
                 "phone": "111-573-7236",
                 "address": "11 Russell Way"
             },
             {
                 "id": "12",
-                "name": "Bruce Surname",
+                "name": "Surname1",
                 "phone": "112-573-7236",
                 "address": "12 Russell Way"
             },
             {
               "id": "13",
-              "name": "Sername Lastname",
+              "name": "Lastname1",
               "phone": "113-228-6636",
               "address": "13 Russell Help"
             }

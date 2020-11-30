@@ -54,8 +54,6 @@ public class TestAvroGenerator {
 
         JSONArray jsonArray = jsonObject.getJSONArray("arr");
 
-        //System.out.println(jsonArray);
-
 
         for (int i = 0; i < jsonArray.length(); i++) {
             result.add(
