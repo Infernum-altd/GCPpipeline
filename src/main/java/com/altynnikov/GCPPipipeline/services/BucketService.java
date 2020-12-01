@@ -9,7 +9,6 @@ import org.apache.avro.file.SeekableByteArrayInput;
 import org.apache.avro.io.DatumReader;
 import org.apache.avro.specific.SpecificDatumReader;
 import org.springframework.beans.factory.annotation.Autowired;
-import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloud.storage.Blob;
 import com.google.cloud.storage.BlobId;
 import com.google.cloud.storage.Storage;
@@ -24,15 +23,11 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class BucketService {
-
     private final GoogleCredentialsService googleCredentialsService;
 
-    public byte[] downloadClientFileFromBucket(String projectId, String bucketName, String objectName) throws IOException {
-
-        GoogleCredentials googleCredentials = googleCredentialsService.getCredentials();
-
+    public byte[] downloadClientFileFromBucket(String projectId, String bucketName, String objectName, String pathToKey) throws IOException {
         Storage storage = StorageOptions.newBuilder()
-                .setCredentials(googleCredentials)
+                .setCredentials(googleCredentialsService.getCredentials(pathToKey))
                 .setProjectId(projectId).build().getService();
 
         Blob blob = storage.get(BlobId.of(bucketName, objectName));

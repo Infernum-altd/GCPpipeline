@@ -7,6 +7,7 @@ import com.google.cloud.bigquery.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 
@@ -20,28 +21,30 @@ import java.util.logging.Level;
 public class BigQueryService {
     private final GoogleCredentialsService googleCredentialsService;
     private BigQuery bigQuery = null;
+/*    @Value("${authKeyPath}")
+    private String jsonKeyPath;*/
 
-    public void insetRowsToStorage(String datasetName, String tableName, List<Map<String, Object>> rowContents) throws IOException, ResponseHasErrorsException {
+    public void insertClientDataSync(List<Client> clients, String dataSetName, String jsonKeyPath) throws IOException, ResponseHasErrorsException {
+        insetRowsToStorage(dataSetName, "all_fields", ClientUtils.getOptionalRowContent(clients), jsonKeyPath);
+
+        insetRowsToStorage(dataSetName, "non_optional", ClientUtils.getNonOptionalRowContent(clients), jsonKeyPath);
+    }
+
+    private void insetRowsToStorage(String dataSetName, String tableName, List<Map<String, Object>> rowContents, String jsonKeyPath) throws IOException, ResponseHasErrorsException {
         List<InsertAllRequest.RowToInsert> rowToInserts = new ArrayList<>();
         for (Map<String, Object> rowContent : rowContents) {
             rowToInserts.add(InsertAllRequest.RowToInsert.of(rowContent));
         }
 
-        insetRowToStorage(datasetName, tableName, rowToInserts);
+        insetRowToStorage(dataSetName, tableName, rowToInserts, jsonKeyPath);
     }
 
-    public void insertClientDataSync(List<Client> clients) throws IOException, ResponseHasErrorsException {
-        insetRowsToStorage("clients", "all_fields", ClientUtils.getOptionalRowContent(clients));
-
-        insetRowsToStorage("clients", "non_optional", ClientUtils.getNonOptionalRowContent(clients));
-    }
-
-    private void insetRowToStorage(String datasetName, String tableName, List<InsertAllRequest.RowToInsert> rowContents) throws ResponseHasErrorsException, IOException, BigQueryException {
+    private void insetRowToStorage(String dataSetName, String tableName, List<InsertAllRequest.RowToInsert> rowContents, String jsonKeyPath) throws ResponseHasErrorsException, IOException, BigQueryException {
         bigQuery = (bigQuery == null) ? BigQueryOptions.newBuilder()
-                .setCredentials(googleCredentialsService.getCredentials()).build().getService() : bigQuery;
+                .setCredentials(googleCredentialsService.getCredentials(jsonKeyPath)).build().getService() : bigQuery;
 
         // Get table
-        TableId tableId = TableId.of(datasetName, tableName);
+        TableId tableId = TableId.of(dataSetName, tableName);
 
         // Inserts rowContent into datasetName:tableId.
         InsertAllResponse response =

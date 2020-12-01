@@ -1,18 +1,25 @@
 package com.altynnikov.GCPPipipeline;
 
 import com.altynnikov.GCPPipipeline.example.gcp.Client;
+import com.altynnikov.GCPPipipeline.helpers.BigQueryUtils;
+import com.altynnikov.GCPPipipeline.helpers.GetClientList;
 import com.altynnikov.GCPPipipeline.helpers.LogHandler;
 import com.altynnikov.GCPPipipeline.services.BigQueryService;
+import com.google.cloud.bigquery.BigQuery;
+import com.google.cloud.bigquery.DatasetInfo;
+import com.google.cloud.bigquery.testing.RemoteBigQueryHelper;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.core.io.ClassPathResource;
 
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -24,42 +31,30 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class BigQueryServiceTest {
     @Autowired
     private BigQueryService bigQueryService;
-    private static final List<Map<String, Object>> rowContents = new ArrayList<>();
+    private static List<Client> clients = new ArrayList<>();
+    private static final String projectId = "splendid-tower-297314";
+    private static BigQuery bigquery;
+    private static String dataset = "test";
 
     @BeforeAll
-    public static void setUp() {
-        Client client = Client.newBuilder()
-                .setId(998)
-                .setName("Ivan Tester")
-                .setPhone("592-000-1236")
-                .setAddress("13 Lucky Street")
-                .build();
+    public static void setUp() throws Exception {
+        clients = GetClientList.clientsList;
 
-        Client client2 = Client.newBuilder()
-                .setId(997)
-                .setName("Bogdan Tester")
-                .setPhone("192-101-1231")
-                .setAddress("12 Unlucky Street")
-                .build();
+        RemoteBigQueryHelper bigqueryHelper =
+                RemoteBigQueryHelper.create(projectId, new FileInputStream(new File("src/main/resources/splendid-tower-297314-eb167dbe4da0.json").getAbsolutePath()));
+        bigquery = bigqueryHelper.getOptions().getService();
+        //dataset = RemoteBigQueryHelper.generateDatasetName();
 
+        BigQueryUtils.createTablesForClientTest(dataset);
+    }
 
-        Map<String, Object> rowContent = new HashMap<>();
-        rowContent.put("id", client.getId());
-        rowContent.put("name", client.getName());
-        rowContent.put("phone", client.getPhone());
-        rowContent.put("address", client.getAddress());
-        rowContents.add(rowContent);
-
-        Map<String, Object> rowContent2 = new HashMap<>();
-        rowContent2.put("id", client2.getId());
-        rowContent2.put("name", client2.getName());
-        rowContent2.put("phone", client2.getPhone());
-        rowContent2.put("address", client2.getAddress());
-        rowContents.add(rowContent2);
+    @AfterAll
+    public static void cleanUp() {
+        RemoteBigQueryHelper.forceDelete(bigquery, dataset);
     }
 
     @Test
-    public void insetRowsToStorage() throws Exception {
+    public void insertClientDataSyncTest() throws Exception {
         Logger logger = Logger.getLogger(BigQueryService.class.getName());
         LogHandler handler = new LogHandler();
         handler.setLevel(Level.ALL);
@@ -67,7 +62,7 @@ public class BigQueryServiceTest {
         logger.addHandler(handler);
         logger.setLevel(Level.ALL);
 
-        bigQueryService.insetRowsToStorage("clients", "all_fields", rowContents);
+        bigQueryService.insertClientDataSync(clients, dataset, "/splendid-tower-297314-eb167dbe4da0.json");
 
         assertEquals(Level.INFO, handler.checkLevel());
     }

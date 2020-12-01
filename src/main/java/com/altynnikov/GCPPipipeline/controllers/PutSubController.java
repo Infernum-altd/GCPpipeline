@@ -8,7 +8,6 @@ import com.altynnikov.GCPPipipeline.services.BucketService;
 import com.altynnikov.GCPPipipeline.example.gcp.Client;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
-import org.apache.commons.lang3.StringUtils;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -22,7 +21,6 @@ import org.springframework.web.bind.annotation.RestController;
 import java.io.IOException;
 import java.util.*;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 @RestController
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
@@ -32,6 +30,10 @@ public class PutSubController {
     private String projectId;
     @Value("${bucketId}")
     private String bucketId;
+    @Value("${authKeyPath}")
+    private String jsonKeyPath;
+    @Value("${dataSetOfClientsName}")
+    private String dataSetName;
 
     private final BucketService bucketService;
     private final BigQueryService bigQueryService;
@@ -51,11 +53,12 @@ public class PutSubController {
 
         try {
             byte[] downloadedAvro = bucketService.
-                    downloadClientFileFromBucket(projectId, bucketId, new JSONObject(target).getString("name"));
+                    downloadClientFileFromBucket(projectId, bucketId,
+                            new JSONObject(target).getString("name"), jsonKeyPath);
 
             List<Client> clients = bucketService.getClientsFromAvro(downloadedAvro);
 
-            bigQueryService.insertClientDataSync(clients);
+            bigQueryService.insertClientDataSync(clients, dataSetName, jsonKeyPath);
         } catch (IOException | AvroNoClientFoundException | ResponseHasErrorsException e) {
             log.log(Level.SEVERE, e.getMessage());
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
