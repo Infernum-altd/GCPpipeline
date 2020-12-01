@@ -16,5 +16,4 @@ public class GoogleCredentialsService {
         return GoogleCredentials.fromStream(GoogleCredentialsService.class.getResourceAsStream(jsonKeyPath))
                 .createScoped("https://www.googleapis.com/auth/cloud-platform");
     }
-
 }

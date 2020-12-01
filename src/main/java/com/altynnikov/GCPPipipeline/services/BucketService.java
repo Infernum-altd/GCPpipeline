@@ -2,6 +2,7 @@ package com.altynnikov.GCPPipipeline.services;
 
 import com.altynnikov.GCPPipipeline.example.gcp.Client;
 import com.altynnikov.GCPPipipeline.exeptions.AvroNoClientFoundException;
+import lombok.Cleanup;
 import lombok.RequiredArgsConstructor;
 import org.apache.avro.file.DataFileReader;
 import org.apache.avro.file.SeekableByteArrayInput;
@@ -39,10 +40,10 @@ public class BucketService {
         return blob.getContent();
     }
 
-    public List<Client> getClientsFromAvro(byte[] avroFile) throws IOException, AvroNoClientFoundException {
+    public List<Client> getClientsFromAvro(byte[] avroFile) throws AvroNoClientFoundException, IOException {
         DatumReader<Client> clientDatumReader = new SpecificDatumReader<>(Client.class);
 
-        DataFileReader<Client> dataFileReader = new DataFileReader<>(new SeekableByteArrayInput(avroFile), clientDatumReader);
+        @Cleanup DataFileReader<Client> dataFileReader = new DataFileReader<>(new SeekableByteArrayInput(avroFile), clientDatumReader);
 
         List<Client> clients = new ArrayList<>();
 
@@ -50,7 +51,8 @@ public class BucketService {
             clients.add(dataFileReader.next());
         }
 
-        if (clients.isEmpty()) throw new AvroNoClientFoundException("In avro wasn`t found any clients record");
+        if (clients.isEmpty()) throw new AvroNoClientFoundException("In avro wasn't" +
+                " found any clients record");
 
         return clients;
     }
