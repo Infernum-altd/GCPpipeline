@@ -48,9 +48,7 @@ public class BucketServiceTests {
         Mockito.when(bucketServiceMock.downloadClientFileFromBucket(projectId, bucketId, "testfile.avsc", "/"))
                 .thenThrow(IOException.class);
 
-        assertThrows(IOException.class, () -> {
-            bucketServiceMock.downloadClientFileFromBucket(projectId, bucketId, "testfile.avsc", "/");
-        });
+        assertThrows(IOException.class, () -> bucketServiceMock.downloadClientFileFromBucket(projectId, bucketId, "testfile.avsc", "/"));
     }
 
     @Test
@@ -66,9 +64,7 @@ public class BucketServiceTests {
         Mockito.when(bucketServiceMock.getClientsFromAvro(FileUtils.readFileToByteArray(new File("src/test/resources/testfileEmpty.avsc"))))
                 .thenThrow(AvroNoClientFoundException.class);
 
-        assertThrows(AvroNoClientFoundException.class, () -> {
-            bucketServiceMock.getClientsFromAvro(FileUtils.readFileToByteArray(new File("src/test/resources/testfileEmpty.avsc")));
-        });
+        assertThrows(AvroNoClientFoundException.class, () -> bucketServiceMock.getClientsFromAvro(FileUtils.readFileToByteArray(new File("src/test/resources/testfileEmpty.avsc"))));
     }
 
 }

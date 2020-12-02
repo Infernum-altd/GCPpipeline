@@ -34,12 +34,28 @@ public class BigQueryServiceTest {
     private BigQueryService bigQueryService;
     @Mock
     private BigQueryService bigQueryServiceMock;
+
     private static List<Client> clients = new ArrayList<>();
-    private static List<Client> damagedClients = new ArrayList<>();
     private static final String projectId = "splendid-tower-297314";
     private static BigQuery bigquery;
     private static final String dataset = "test";
     private static final String jsonKeyPath = "/splendid-tower-297314-eb167dbe4da0.json";
+
+    /**
+     *I didn't know how better test this Service,
+     * because there is no an emulator for Google BigQuery.
+     *
+     * So as according here https://github.com/googleapis/google-cloud-java/blob/master/TESTING.md#testing-code-that-uses-bigquery
+     * I created separate project with BigQuery for testing, where before test I create necessary tables and after delete.
+     *
+     *And as you suggested used Mockito to test exception conditions.
+     *
+     * And question. Can I inject my service for working with test BigQuery or I shouldn't do that ?
+     * Because It's a real entity, and It seems that we shouldn't use them while testing
+     *
+     * Hope it's better than before
+     *
+     */
 
     @BeforeAll
     public static void setUp() throws Exception {
