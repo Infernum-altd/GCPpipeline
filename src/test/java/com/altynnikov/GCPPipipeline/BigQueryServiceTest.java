@@ -6,14 +6,12 @@ import com.altynnikov.GCPPipipeline.helpers.GetClientList;
 import com.altynnikov.GCPPipipeline.helpers.LogHandler;
 import com.altynnikov.GCPPipipeline.services.BigQueryService;
 import com.google.cloud.bigquery.BigQuery;
-import com.google.cloud.bigquery.DatasetInfo;
 import com.google.cloud.bigquery.testing.RemoteBigQueryHelper;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.core.io.ClassPathResource;
 
 
 import java.io.File;
@@ -22,7 +20,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -40,10 +37,9 @@ public class BigQueryServiceTest {
     public static void setUp() throws Exception {
         clients = GetClientList.clientsList;
 
-        RemoteBigQueryHelper bigqueryHelper =
-                RemoteBigQueryHelper.create(projectId, new FileInputStream(new File("src/main/resources/splendid-tower-297314-eb167dbe4da0.json").getAbsolutePath()));
+        RemoteBigQueryHelper bigqueryHelper = RemoteBigQueryHelper.create(projectId, new FileInputStream(
+                        new File("src/main/resources/splendid-tower-297314-eb167dbe4da0.json").getAbsolutePath()));
         bigquery = bigqueryHelper.getOptions().getService();
-        //dataset = RemoteBigQueryHelper.generateDatasetName();
 
         BigQueryUtils.createTablesForClientTest(dataset);
     }

@@ -6,7 +6,8 @@ import com.altynnikov.GCPPipipeline.services.BucketService;
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.io.File;
@@ -19,8 +20,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest
 public class BucketServiceTests {
-    @Autowired
-    private BucketService bucketService;
+    @Mock
+    private BucketService bucketServiceMock;
 
     private final String projectId = "splendid-tower-297314";
     private final String bucketId = "test_gcppipeline";
@@ -33,13 +34,19 @@ public class BucketServiceTests {
 
     @Test
     public void downloadClientFileFromBucketTest() throws Exception {
-        assertArrayEquals(FileUtils.readFileToByteArray(new File("src/test/resources/testfile.avsc")),
-                bucketService.downloadClientFileFromBucket(projectId, bucketId, "testfile.avsc", "/splendid-tower-297314-eb167dbe4da0.json"));
+        Mockito.when(bucketServiceMock.downloadClientFileFromBucket(projectId, bucketId, "testfile.avsc", "/splendid-tower-297314-eb167dbe4da0.json"))
+                .thenReturn(FileUtils.readFileToByteArray(new File("src/test/resources/testfile.avsc")));
+
+         byte[] actual = bucketServiceMock.downloadClientFileFromBucket(projectId, bucketId, "testfile.avsc", "/splendid-tower-297314-eb167dbe4da0.json");
+
+         assertArrayEquals(FileUtils.readFileToByteArray(new File("src/test/resources/testfile.avsc")), actual);
     }
 
     @Test
     public void getClientsFromAvroTest() throws Exception {
-        assertEquals(clientsList, bucketService
+        Mockito.when(bucketServiceMock.getClientsFromAvro(FileUtils.readFileToByteArray(new File("src/test/resources/testfile.avsc"))))
+                .thenReturn(clientsList);
+        assertEquals(clientsList, bucketServiceMock
                 .getClientsFromAvro(FileUtils.readFileToByteArray(new File("src/test/resources/testfile.avsc"))));
     }
 }

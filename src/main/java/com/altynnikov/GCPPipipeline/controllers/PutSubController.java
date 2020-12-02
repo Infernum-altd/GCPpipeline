@@ -43,7 +43,7 @@ public class PutSubController {
         // Get PubSub message from request body.
         Body.Message message = body.getMessage();
 
-        if (body.isMessageValid()) {
+        if (!body.isMessageValid()) {
             String msg = "Bad Request: invalid Pub/Sub message format";
             log.log(Level.WARNING, msg);
             return new ResponseEntity<>(msg, HttpStatus.BAD_REQUEST);

@@ -27,9 +27,11 @@ public class TestAvroGenerator {
             .build();
 
     public static void main(String[] args) throws IOException, JSONException {
-        List<Client> clients = parceJsonInClients(Paths.get("src/test/resources/client1.avsc"));
+       /* List<Client> clients = parceJsonInClients(Paths.get("src/test/resources/client1.avsc"));
 
-        generateAvro(clients, Paths.get("src/test/resources/severalClients.avsc"));
+        generateAvro(clients, Paths.get("src/test/resources/severalClients.avsc"));*/
+
+        generateAvro(new ArrayList<>(), Paths.get("src/test/resources/testfileEmpty.avsc"));
     }
 
     public static void generateAvro(List<Client> clientList, Path targetPath) {
@@ -47,7 +49,6 @@ public class TestAvroGenerator {
     }
 
     private static List<Client> parceJsonInClients(Path path) throws JSONException, IOException {
-
         List<Client> result = new ArrayList<>();
 
         JSONObject jsonObject = new JSONObject(new String(Files.readAllBytes(path)));
@@ -65,7 +66,6 @@ public class TestAvroGenerator {
                             .build());
 
         }
-
         return result;
     }
 }

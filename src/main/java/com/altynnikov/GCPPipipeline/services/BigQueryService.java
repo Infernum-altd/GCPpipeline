@@ -7,7 +7,6 @@ import com.google.cloud.bigquery.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 
@@ -21,8 +20,6 @@ import java.util.logging.Level;
 public class BigQueryService {
     private final GoogleCredentialsService googleCredentialsService;
     private BigQuery bigQuery = null;
-/*    @Value("${authKeyPath}")
-    private String jsonKeyPath;*/
 
     public void insertClientDataSync(List<Client> clients, String dataSetName, String jsonKeyPath) throws IOException, ResponseHasErrorsException {
         insetRowsToStorage(dataSetName, "all_fields", ClientUtils.getOptionalRowContent(clients), jsonKeyPath);
